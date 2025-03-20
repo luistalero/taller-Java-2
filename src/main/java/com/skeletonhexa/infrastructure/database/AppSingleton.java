@@ -1,7 +1,7 @@
 package com.skeletonhexa.infrastructure.database;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public enum AppSingleton {
@@ -10,13 +10,15 @@ public enum AppSingleton {
     private final Properties propiedades = new Properties();
 
     AppSingleton() {
-        cargarConfiguraciones("config.properties");
+        cargarConfiguraciones("configmysql.properties");
     }
 
     private void cargarConfiguraciones(String rutaArchivo) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        try (FileInputStream archivo = new FileInputStream(classLoader.getResource(rutaArchivo).getFile())) {
-            propiedades.load(archivo);
+    try (InputStream imputStream = getClass().getClassLoader().getResourceAsStream(rutaArchivo)) {
+        if (imputStream == null) {
+            throw new IOException("Archivo no encontrado: " + rutaArchivo);
+        }
+        propiedades.load(imputStream);
         } catch (IOException e) {
             System.err.println("❌ Error cargando configuración: " + e.getMessage());
         }
